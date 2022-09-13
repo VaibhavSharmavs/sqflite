@@ -5,14 +5,22 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelper {
-  static const _databaseName = "MyDatabase.db";
-  static const _databaseVersion = 1;
+  static const _databaseName = "NewDatabase.db";
+  static const _databaseVersion = 2;
 
   static const table = 'my_table';
+  static const signUpTable = 'sign_up_table';
 
   static const columnId = '_id';
   static const columnName = 'name';
   static const columnAge = 'age';
+
+  static const id = 'id';
+  static const name = 'name';
+  static const lastName = 'lastName';
+  static const dob = 'dob';
+  static const password = 'password';
+  static const email = 'email';
 
   // make this a singleton class
   DatabaseHelper._privateConstructor();
@@ -44,6 +52,15 @@ class DatabaseHelper {
             $columnAge INTEGER NOT NULL
           )
           ''');
+    await db.execute('''
+          CREATE TABLE $signUpTable (
+            $id INTEGER PRIMARY KEY,
+            $name TEXT NOT NULL,
+            $lastName TEXT NOT NULL,
+            $password TEXT NOT NULL,
+            $email TEXT NOT NULL
+          )
+          ''');
   }
 
   // Helper methods
@@ -56,11 +73,29 @@ class DatabaseHelper {
     return await db!.insert(table, row);
   }
 
+  Future<int> insetSignUpData(Map<String, dynamic> row) async {
+    Database? db = await instance.database;
+    return await db!.insert(signUpTable, row);
+  }
+
   // All of the rows are returned as a list of maps, where each map is
   // a key-value list of columns.
   Future<List<Map<String, dynamic>>> queryAllRows() async {
     Database? db = await instance.database;
     return await db!.query(table);
+  }
+
+  Future<List<Map<String, dynamic>>> queryAllSignUpData() async {
+    Database? db = await instance.database;
+    return await db!.query(signUpTable);
+  }
+
+  Future<bool> isUserNameExists(String username) async {
+    Database? db = await instance.database;
+    int exists = Sqflite.firstIntValue(await db!.rawQuery(
+            'SELECT COUNT(*) FROM $signUpTable WHERE $name ="$username"')) ??
+        0;
+    return exists == 1;
   }
 
   // All of the methods (insert, query, update, delete) can also be done using

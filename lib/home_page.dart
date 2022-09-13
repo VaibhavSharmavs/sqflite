@@ -95,14 +95,39 @@ class _HomePageState extends State<HomePage> {
       DatabaseHelper.columnName: artistName,
       DatabaseHelper.columnAge: artistAge
     };
+
     final id = await dbHelper.insert(row);
     debugPrint('inserted row id: $id');
+
+    Map<String, dynamic> signUpRow = {
+      DatabaseHelper.name: 'vbv',
+      DatabaseHelper.lastName: 'email',
+      DatabaseHelper.email: 'vbv@gmail.com',
+      DatabaseHelper.password: 'vbv@123!'
+    };
+
+    final signID = await dbHelper.insetSignUpData(signUpRow);
+
+    debugPrint('inserted row id: $signID');
   }
 
   void query() async {
     allRows = await dbHelper.queryAllRows();
     print('query all rows:');
     allRows.forEach(print);
+
+    List<Map<String, dynamic>> signUpData = await dbHelper.queryAllSignUpData();
+
+    print('query all signUP rows:');
+    signUpData.forEach(print);
+
+    bool isUsernameExists = await dbHelper.isUserNameExists('abh');
+
+    print('exists $isUsernameExists');
+    bool isVBV = await dbHelper.isUserNameExists('vbv');
+
+    print('exists $isVBV');
+
     setState(() {});
   }
 }
